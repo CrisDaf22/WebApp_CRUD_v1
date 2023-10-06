@@ -1,15 +1,28 @@
 package com.ipn.mx.controlador.producto;
 
+import com.ipn.mx.modelo.dao.ProductoDAO;
+import com.ipn.mx.modelo.dto.ProductoDTO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+import java.io.InputStream;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-@WebServlet(name = "CrearProducto", value = "/CrearProducto")
-public class CrearProducto extends HttpServlet {
+@WebServlet(name = "ProcesarC", value = "/ProcesarC")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+    maxFileSize = 1024 * 1024 * 2,      // 2 MB
+    maxRequestSize = 1024 * 1024 * 5   // 5 MB
+)
+public class ProcesarC extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -28,44 +41,41 @@ public class CrearProducto extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Crear producto</title>");   
+            out.println("<title>Respuesta creación</title>"); 
             out.println("<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'></script>");
             out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css' rel='stylesheet'>");
             out.println("</head>");
             out.println("<body>");
+            out.println("<h1 class='h1' style='text-align: center'>Respuesta del sistema</h1>");
+            out.println("<div class='container' style='text-align: center'>");
             
-            out.println("<div class='container' style='width: 30%'>");
-            out.println("<h1 class='h1' style='text-align: center'>Crear</h1>");
-            out.println("<form action='ProcesarC' method='POST' enctype='multipart/form-data'>");
+            String nombreProducto = request.getParameter("txt_nombre");
+            String descripcionProducto = request.getParameter("txt_descripcion");
+            int cantidadProducto = Integer.parseInt(request.getParameter("txt_cantidad"));
             
-            out.println("<div class='form-group'>");
-            out.println("<label for='txt_nombre'>Nombre del producto</label>");
-            out.println("<input type='text' class='form-control' id='txt_nombre' placeholder='Nombre' name='txt_nombre'>");
-            out.println("</div>");
+            Part parteArchivo = request.getPart("txt_imagen");
+            InputStream is = parteArchivo.getInputStream();
             
-            out.println("<div class='form-group'>");
-            out.println("<label for='txt_descripcion'>Descripción del producto</label>");
-            out.println("<input type='text' class='form-control' id='txt_descripcion' placeholder='Descripción' name='txt_descripcion'>");
-            out.println("</div>");
+            ProductoDTO dto = new ProductoDTO();
+            ProductoDAO dao = new ProductoDAO();
+            dto.getEntidad().setNombreProducto(nombreProducto);
+            dto.getEntidad().setDescripcionProducto(descripcionProducto);
+            dto.getEntidad().setCantidadProducto(cantidadProducto);
+            // Máximo 64 kb debido al tipo BLOB 
+            dto.getEntidad().setImagenProducto(is);
             
-            out.println("<div class='form-group'>");
-            out.println("<label for='txt_cantidad'>Cantidad del producto</label>");
-            out.println("<input type='number' class='form-control' id='txt_cantidad' min='10' max='100' name='txt_cantidad'>");
-            out.println("</div>");
+            try {
+                dao.insertarProducto(dto);
+                
+                out.println("<div class='alert alert-success' role='alert'>El producto se creó con éxito.</div>");
+            } catch (SQLException ex) {
+                Logger.getLogger(ProcesarC.class.getName()).log(Level.SEVERE, null, ex);
+                out.println("<div class='alert alert-danger' role='alert'>No se pudo registrar el producto..</div>");
+            }
             
-            out.println("<div class='form-group'>");
-            out.println("<label for='txt_imagen'>Imágen del producto</label>");
-            out.println("<input type='file' accept='image/png, image/jpg, image/jpeg' class='form-control' id='txt_imagen' placeholder='Sube una imágen' name='txt_imagen'>");
-            out.println("</div>");
-            
-            out.println("<br>");
-            out.println("<center><input type='submit' class='btn btn-outline-primary' text='Crear'></center><br>");
-            out.println("<center><a href='ListadoProductos' class='btn btn-outline-danger'>Regresar</a></center>");
-            
-            out.println("</form>");
+            out.println("<center><a href='ListadoProductos' class='btn btn-outline-primary'>Regresar</a></center>");
             out.println("</div>");
             out.println("</body>");
-            
             out.println("</html>");
         }
     }
