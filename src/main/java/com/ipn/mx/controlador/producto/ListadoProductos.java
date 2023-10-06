@@ -67,9 +67,9 @@ public class ListadoProductos extends HttpServlet {
                         out.println("<td>" + p.getEntidad().getIdProducto() + "</td>");
                         out.println("<td>" + p.getEntidad().getNombreProducto()+ "</td>");
                         out.println("<td>");
-                        out.println("<a href='#' class='btn btn-outline-success'>Leer</a> &nbsp");
-                        out.println("<a href='#' class='btn btn-outline-warning'>Actualizar</a> &nbsp");
-                        out.println("<a href='#' class='btn btn-outline-info'>Eliminar</a>");
+                        out.println("<a href='LeerProducto?idProducto=" + p.getEntidad().getIdProducto() + "' class='btn btn-outline-success'>Leer</a> &nbsp");
+                        out.println("<a href='ActualizarProducto?idProducto=" + p.getEntidad().getIdProducto() + "' class='btn btn-outline-warning'>Actualizar</a> &nbsp");
+                        out.println("<a href='EliminarProducto?idProducto=" + p.getEntidad().getIdProducto() + "' class='btn btn-outline-info'>Eliminar</a>");
                         out.println("</td>");
                         out.println("</tr>");
                     }
