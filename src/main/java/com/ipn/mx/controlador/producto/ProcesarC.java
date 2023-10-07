@@ -73,7 +73,7 @@ public class ProcesarC extends HttpServlet {
                 out.println("<div class='alert alert-danger' role='alert'>No se pudo registrar el producto.</div>");
             }
             
-            out.println("<center><a href='ListadoProductos' class='btn btn-outline-primary'>Regresar</a></center>");
+            out.println("<center><a href='ListadoProductos' class='btn btn-outline-danger'>Regresar</a></center>");
             out.println("</div>");
             out.println("</body>");
             out.println("</html>");

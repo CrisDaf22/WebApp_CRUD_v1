@@ -9,15 +9,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "LeerProducto", value = "/LeerProducto")
-public class LeerProducto extends HttpServlet {
+@WebServlet(name = "EliminarProducto", value = "/EliminarProducto")
+public class EliminarProducto extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -36,69 +33,28 @@ public class LeerProducto extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Leer producto</title>");
+            out.println("<title>Respuesta eliminación</title>"); 
             out.println("<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js'></script>");
-            out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css' rel='stylesheet'>");            
+            out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css' rel='stylesheet'>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<center><h1 class='h1'>Leer producto</h1></center>");
-            out.println("<div class='container' style='text-align: center;width: 50%'>");
+            out.println("<center><h1 class='h1'>Respuesta del sistema</h1></center>");
+            out.println("<div class='container' style='text-align: center'>");
             
             int idProducto = Integer.parseInt(request.getParameter("idProducto"));
+            
             ProductoDTO dto = new ProductoDTO();
             dto.getEntidad().setIdProducto(idProducto);
+            
             ProductoDAO dao = new ProductoDAO();
             
             try {
-                ProductoDTO dtor = null;
-                dtor = dao.leerProducto(dto);
+                dao.eliminarProducto(dto);
                 
-                // Procesar datos de imágen
-                InputStream is = dtor.getEntidad().getImagenProducto();
-                byte[] buffer = new byte[is.available()];
-                int bytesLeidos;
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                while ((bytesLeidos = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, bytesLeidos);
-                }
-                byte[] datos = baos.toByteArray();
-                String encoded = Base64.getEncoder().encodeToString(datos);
-                
-                out.println("<table class='table table-bordered border-primary'>");
-                out.println("<tr>");
-                out.println("<th scope='row'>ID</th>");
-                out.println("<td>" + dtor.getEntidad().getIdProducto() + "</td>");
-                out.println("</tr>");
-                out.println("</thead>");
-                
-                out.println("<tr>");
-                out.println("<th scope='row'>Nombre</th>");
-                out.println("<td>" + dtor.getEntidad().getNombreProducto() + "</td>");
-                out.println("</tr>");
-                out.println("</thead>");
-                
-                out.println("<tr>");
-                out.println("<th scope='row'>Descripción</th>");
-                out.println("<td>" + dtor.getEntidad().getDescripcionProducto() + "</td>");
-                out.println("</tr>");
-                out.println("</thead>");
-                
-                out.println("<tr>");
-                out.println("<th scope='row'>Cantidad</th>");
-                out.println("<td>" + dtor.getEntidad().getCantidadProducto() + "</td>");
-                out.println("</tr>");
-                out.println("</thead>");
-                
-                out.println("<tr>");
-                out.println("<th scope='row'>Imágen</th>");
-                out.println("<td><img src='data:image/jpeg;base64," + encoded + "' width='125' height='125'/></td>");
-                out.println("</tr>");
-                out.println("</thead>");
-                
-                out.println("</table>");
+                out.println("<div class='alert alert-success' role='alert'>El producto se elliminó con éxito.</div>");
             } catch (SQLException ex) {
-                Logger.getLogger(LeerProducto.class.getName()).log(Level.SEVERE, null, ex);
-                out.println("<div class='alert alert-danger' role='alert'>No se pudo encontrar el producto.</div>");
+                Logger.getLogger(EliminarProducto.class.getName()).log(Level.SEVERE, null, ex);
+                out.println("<div class='alert alert-danger' role='alert'>No se pudo eliminar el producto.</div>");
             }
             
             out.println("<center><a href='ListadoProductos' class='btn btn-outline-danger'>Regresar</a></center>");
